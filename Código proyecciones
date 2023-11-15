@@ -1,0 +1,37 @@
+!pip install prophet 
+#Instalar la librería de prophet 
+import pandas as pd
+from prophet import Prophet
+import matplotlib.pyplot as plt
+import datetime
+from matplotlib import colors
+from matplotlib.ticker import PercentFormatter
+from sklearn.metrics import mean_squared_error
+from statsmodels.tsa.arima_model import ARIMA
+import pandas as pd
+import numpy as np
+#Importar librerías necesarias para el funcionamiento del código
+df = pd.read_csv('ventas 22-23.csv')
+df.head()
+#Leer el archivo a proyectar 
+m1 = Prophet(weekly_seasonality=True)
+m1.add_country_holidays(country_name='CL')
+#Añadir a la proyección la variable de temporalidades festivas Chilenas
+m1.fit(df)
+future1 = m1.make_future_dataframe(periods=12, freq= 'W')
+#Definir la proyección con cantidad de periodos y frecuencias. En este caso 12 semanas (W), para días (D) y meses (M)
+forecast1 = m1.predict(future1)
+#Definir forecast para las variables elegidas 
+m1.train_holiday_names
+plt.plot(df['y'])
+plt.plot(forecast1['yhat'])
+plt.show()
+#mostar gráfica de la proyección 
+forecast1 = m1.predict(future1)
+forecast1[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail()
+#mostrar tabla detallada de los resultados de la proyección 
+df['wmape'] = np.sum((df['y'] - forecast1['yhat']).abs()) / np.sum(df['y'])
+#Calcular el error promedio de la proyección
+df["wmape"].mean()
+forecast1.to_csv("Pronos ventas 22-23.csv", index=False)
+#Exportar el archivo 
